@@ -6,7 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>WoW Interface Viewer</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css"/>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
 	<link rel="stylesheet" href="/main.css"/>
 </head>
 <body ng-cloak ng-app="app" ng-controller="MainController as main">
@@ -72,7 +72,7 @@
 
 					<li>
 						<input type="text" style="margin-left:10px;width:80px;" placeholder="Jump to.." class="form-control"
-								ng-model="main.currentPage" ng-change="main.getPages()" />
+								ng-model="main.currentPage" ng-change="main.getPages()"/>
 					</li>
 				</ul>
 			</nav>
@@ -84,7 +84,7 @@
 				</div>
 
 				<div class="card-body">
-					<p class="text-sm">{{ main.getPath(file) }}</p>
+					<p class="text-small">{{ main.getPath(file) }}</p>
 					<div class="input-group">
 						<input type="text" class="form-control form-control-sm" ng-value="main.getPath(file)">
 						<span class="input-group-append">
@@ -119,13 +119,97 @@
 
 					<li>
 						<input type="text" style="margin-left:10px;width:80px;" placeholder="Jump to.." class="form-control"
-								ng-model="main.currentPage" ng-change="main.getPages()" />
+								ng-model="main.currentPage" ng-change="main.getPages()"/>
 					</li>
 				</ul>
 			</nav>
 		</div>
 	</div>
 </main>
+
+<div class="modal fade show" tabindex="-1" role="dialog"
+		style="display: block; padding-right: 17px;" ng-style="{display: (main.showModal ? 'block' : 'none')}">
+
+	<div class="modal-dialog" role="document" ng-if="main.currentFile">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLiveLabel">Preview Texture</h5>
+				<button type="button" class="close">
+					<span aria-hidden="true">×</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p class="text-small">{{ main.getPath(main.currentFile) }}</p>
+				<div style="position: relative;"
+						ng-style="{width: main.currentSize.width + 'px', height: main.currentSize.height + 'px'}">
+					<img ng-src="{{ main.getImageUrl(main.currentFile) }}" alt="{{ main.getPath(main.currentFile) }}"
+							imageonload="main.updateImageSize(element)"
+							ng-style="{clip: main.getImgClip(), position: 'absolute'}">
+				</div>
+				<form action="">
+					<table>
+						<thead>
+						<tr>
+							<th></th>
+							<th>Coord</th>
+							<th>Pixel</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr>
+							<td>Top</td>
+							<td>
+								<input type="text" ng-model="main.clip.coord.top" class="form-control form-control-sm"
+										ng-change="main.updateClip('coord')">
+							</td>
+							<td><input type="text" ng-model="main.clip.pixel.top" class="form-control form-control-sm"
+									ng-change="main.updateClip('pixel')">
+							</td>
+						</tr>
+						<tr>
+							<td>Left</td>
+							<td>
+								<input type="text" ng-model="main.clip.coord.left" class="form-control form-control-sm"
+										ng-change="main.updateClip('coord')">
+							</td>
+							<td>
+								<input type="text" ng-model="main.clip.pixel.left" class="form-control form-control-sm"
+										ng-change="main.updateClip('pixel')">
+							</td>
+						</tr>
+						<tr>
+							<td>Bottom</td>
+							<td>
+								<input type="text" ng-model="main.clip.coord.bottom" class="form-control form-control-sm"
+										ng-change="main.updateClip('coord')">
+							</td>
+							<td>
+								<input type="text" ng-model="main.clip.pixel.bottom" class="form-control form-control-sm"
+										ng-change="main.updateClip('pixel')">
+							</td>
+						</tr>
+						<tr>
+							<td>Right</td>
+							<td>
+								<input type="text" ng-model="main.clip.coord.right" class="form-control form-control-sm"
+										ng-change="main.updateClip('coord')">
+							</td>
+							<td>
+								<input type="text" ng-model="main.clip.pixel.right" class="form-control form-control-sm"
+										ng-change="main.updateClip('pixel')">
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary">Save changes</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.7.1/localforage.nopromises.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>

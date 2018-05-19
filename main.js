@@ -12,13 +12,18 @@ class MainController {
 			repoUrl: 'https://github.com/Gethe/wow-ui-textures/'
 		};
 
+		this.clip = {
+			pixel: {top: 0, left: 0, bottom: 0, right: 0},
+			coord: {top: 0, left: 0, bottom: 1, right: 1},
+		};
+
 		localforage.config({
-			driver      : localforage.WEBSQL, // Force WebSQL; same as using setDriver()
-			name        : 'wowInterfaceViewer',
-			version     : 1.0,
-			size        : 100000000, // Size of database, in bytes. WebSQL-only for now.
-			storeName   : 'keyvaluepairs', // Should be alphanumeric, with underscores.
-			description : 'some wowInterfaceViewer'
+			driver: localforage.WEBSQL, // Force WebSQL; same as using setDriver()
+			name: 'wowInterfaceViewer',
+			version: 1.0,
+			size: 100000000, // Size of database, in bytes. WebSQL-only for now.
+			storeName: 'keyvaluepairs', // Should be alphanumeric, with underscores.
+			description: 'some wowInterfaceViewer'
 		});
 
 		let savedSettings = localStorage.getItem('settings');
@@ -33,6 +38,7 @@ class MainController {
 				});
 			}
 		});
+
 	}
 
 	saveSettings() {
@@ -102,7 +108,7 @@ class MainController {
 	}
 
 	fillTemplate(string, vars) {
-		return string.replace(/:([a-zA-Z_]+)/g, function(m, $1) {
+		return string.replace(/:([a-zA-Z_]+)/g, function (m, $1) {
 			return vars[$1];
 		});
 	}
@@ -122,7 +128,7 @@ class MainController {
 		}
 
 		let url = this.buildApiUrl(result, '/repos/:owner/:repo/git/trees/:tree_sha?recursive=1', {tree_sha: 'live'});
-		console.log(url);
+
 		this.$http.get(url).then((response) => {
 
 			this.setFiles(response.data.tree);
@@ -151,7 +157,6 @@ class MainController {
 
 		let upTo = startFrom + this.perPage;
 
-		console.log(startFrom, upTo);
 		return this.filteredFiles.slice(startFrom, upTo);
 	}
 
@@ -167,6 +172,67 @@ class MainController {
 	getPath(file) {
 		return 'Interface\\' + file.path.replace(/\//g, '\\');
 	}
+
+	preview(file) {
+		this.currentFile = file;
+		this.showModal = true;
+	}
+
+	updateImageSize(img) {
+		this.currentSize = {
+			width: img[0].naturalWidth,
+			height: img[0].naturalHeight
+		};
+		console.log(this.currentSize);
+		this.updateClip('coord');
+	}
+
+	updateClip(type) {
+
+		let prec = 10;
+		switch (type) {
+			// coordinates were updated, need to calc pixels
+			case 'coord':
+				this.clip.pixel.top = Math.round(this.clip.coord.top * this.currentSize.height * prec) / prec;
+				this.clip.pixel.bottom = Math.round(this.clip.coord.bottom * this.currentSize.height * prec) / prec;
+				this.clip.pixel.left = Math.round(this.clip.coord.left * this.currentSize.width * prec) / prec;
+				this.clip.pixel.right = Math.round(this.clip.coord.right * this.currentSize.width * prec) / prec;
+				break;
+			// pixels were updated, need to calc coordinates
+			case 'pixel':
+				prec = 10000;
+				this.clip.coord.top = Math.round(this.clip.pixel.top / this.currentSize.height * prec) / prec;
+				this.clip.coord.bottom = Math.round(this.clip.pixel.bottom / this.currentSize.height * prec) / prec;
+				this.clip.coord.left = Math.round(this.clip.pixel.left / this.currentSize.width * prec) / prec;
+				this.clip.coord.right = Math.round(this.clip.pixel.right / this.currentSize.width * prec) / prec;
+				break;
+		}
+	}
+
+	getImgClip() {
+		return 'rect(' +
+			this.clip.pixel.top + 'px, ' +
+			this.clip.pixel.right + 'px, ' +
+			this.clip.pixel.bottom + 'px, ' +
+			this.clip.pixel.left + 'px)';
+	}
 }
 
 app.controller('MainController', MainController);
+
+app.directive('imageonload', function () {
+	return {
+		restrict: 'A',
+		scope: {
+			imageonload: '&'
+		},
+		link: function (scope, element, attrs) {
+			element.bind('load', function () {
+				//call the function that was passed
+				scope.$apply(() => {
+					scope.imageonload({element: element})
+				});
+			});
+		}
+	};
+});
