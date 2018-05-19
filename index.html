@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>WoW Interface Viewer</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+	<link rel="stylesheet" href="/main.css"/>
+</head>
+<body ng-cloak ng-app="app" ng-controller="MainController as main">
+
+<header>
+	<div class="navbar navbar-dark bg-dark box-shadow">
+		<div class="container d-flex justify-content-between bg-light" ng-show="main.settingsVisible">
+			<form>
+				<div class="form-group">
+					<label for="github-repo">Github repository</label>
+					<input type="email" class="form-control" id="github-repo" ng-model="main.settings.repoUrl">
+				</div>
+				<button type="submit" class="btn btn-primary" ng-click="main.saveSettins()">
+					Save
+				</button>
+			</form>
+		</div>
+		<div class="container d-flex justify-content-between">
+			<a href="" class="navbar-brand d-flex align-items-center">
+				WoW Interface
+				<strong>Viewer</strong>
+			</a>
+			<form class="form-inline my-4 my-lg-0">
+				<input type="search" ng-model="main.filter" placeholder="Search" class="form-control mr-sm-4"
+						ng-change="main.filterFiles()">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+			</form>
+			<button class="navbar-toggler collapsed" type="button"
+					ng-click="main.settingsVisible = !main.settingsVisible">
+				<i class="fa fa-cog"></i>
+			</button>
+		</div>
+	</div>
+</header>
+
+<main>
+	<button ng-click="main.readRepository()">
+		<i class="fa fa-download"></i>
+	</button>
+	<div class="container">
+		<div class="row">
+			<nav aria-label="Page navigation example">
+				<ul class="pagination">
+					<li class="page-item">
+						<a class="page-link" href="" ng-click="main.gotoPage(-1, true)">
+							<span aria-hidden="true">&laquo;</span>
+							<span class="sr-only">Previous</span>
+						</a>
+					</li>
+
+					<li class="page-item" ng-repeat="i in main.getPages() track by $index"
+							ng-class="{active: main.currentPage == i}">
+						<a class="page-link" href="" ng-click="main.gotoPage(i)" ng-if="main.currentPage != i">{{ i }}</a>
+						<span class="page-link" ng-if="main.currentPage == i">{{ i }}</span>
+					</li>
+
+					<li class="page-item">
+						<a class="page-link" href="" ng-click="main.gotoPage(1, true)">
+							<span aria-hidden="true">&raquo;</span>
+							<span class="sr-only">Next</span>
+						</a>
+					</li>
+
+					<li>
+						<input type="text" style="margin-left:10px;width:80px;" placeholder="Jump to.." class="form-control"
+								ng-model="main.currentPage" ng-change="main.getPages()" />
+					</li>
+				</ul>
+			</nav>
+		</div>
+		<div class="row">
+			<div class="card" style="width: 18rem;" ng-repeat="file in main.getFiles()">
+				<div class="card-img-top">
+					<img style="max-width: 100%; max-height: 100%" ng-src="{{ main.getImageUrl(file) }}" alt="Interface\{{ file.path }}">
+				</div>
+
+				<div class="card-body">
+					<p class="text-sm">{{ main.getPath(file) }}</p>
+					<div class="input-group">
+						<input type="text" class="form-control form-control-sm" ng-value="main.getPath(file)">
+						<span class="input-group-append">
+							<a href="" class="btn btn-primary btn-sm" ng-click="main.preview(file)">Preview</a>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<nav aria-label="Page navigation example">
+				<ul class="pagination">
+					<li class="page-item">
+						<a class="page-link" href="" ng-click="main.gotoPage(-1, true)">
+							<span aria-hidden="true">&laquo;</span>
+							<span class="sr-only">Previous</span>
+						</a>
+					</li>
+
+					<li class="page-item" ng-repeat="i in main.getPages() track by $index"
+							ng-class="{active: main.currentPage == i}">
+						<a class="page-link" href="" ng-click="main.gotoPage(i)" ng-if="main.currentPage != i">{{ i }}</a>
+						<span class="page-link" ng-if="main.currentPage == i">{{ i }}</span>
+					</li>
+
+					<li class="page-item">
+						<a class="page-link" href="" ng-click="main.gotoPage(1, true)">
+							<span aria-hidden="true">&raquo;</span>
+							<span class="sr-only">Next</span>
+						</a>
+					</li>
+
+					<li>
+						<input type="text" style="margin-left:10px;width:80px;" placeholder="Jump to.." class="form-control"
+								ng-model="main.currentPage" ng-change="main.getPages()" />
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.7.1/localforage.nopromises.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
+<script src="/main.js"></script>
+</body>
+</html>
